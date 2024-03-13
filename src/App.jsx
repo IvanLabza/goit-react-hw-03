@@ -12,16 +12,16 @@ function App() {
     { id: "id-4", name: "Annie Copeland", number: "227-91-26" },
   ];
 
-  const savedContacts =
+  const savedContacts = () =>
     JSON.parse(localStorage.getItem("contacts")) || initialContacts;
 
   const [contacts, setContacts] = useState(savedContacts);
-  const [filteredContacts, setFilteredContacts] = useState(savedContacts);
+
+  const [filter, setFilter] = useState("");
 
   const addContact = (contact) => {
     const newContact = { ...contact, id: nanoid() };
     setContacts([newContact, ...contacts]);
-    setFilteredContacts([newContact, ...filteredContacts]);
   };
 
   useEffect(() => {
@@ -29,19 +29,17 @@ function App() {
   }, [contacts]);
 
   const filterContact = (e) => {
-    const search = e.target.value.toLowerCase();
-    setFilteredContacts(
-      contacts.filter((item) => item.name.toLowerCase().includes(search))
-    );
+    setFilter(e.target.value.toLowerCase());
   };
 
   const handleDelete = (id) => {
     setContacts((prevState) =>
       prevState.filter((contact) => contact.id !== id)
     );
-    setFilteredContacts((prevState) =>
-      prevState.filter((contact) => contact.id !== id)
-    );
+  };
+
+  const getFilteredContacts = () => {
+    return contacts.filter((item) => item.name.toLowerCase().includes(filter));
   };
 
   return (
@@ -49,7 +47,10 @@ function App() {
       <h1>Phonebook</h1>
       <ContactForm addContact={addContact} />
       <SearchBox filterContact={filterContact} />
-      <ContactList handleDelete={handleDelete} contacts={filteredContacts} />
+      <ContactList
+        handleDelete={handleDelete}
+        contacts={getFilteredContacts()}
+      />
     </div>
   );
 }
